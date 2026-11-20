@@ -30,6 +30,7 @@ The derivations behind these functions are written out in `decomposition_notes.m
 
 import io
 import contextlib
+from pathlib import Path
 
 import arcadia_pycolor as apc
 import matplotlib as mpl
@@ -43,6 +44,9 @@ import torch
 from .data import load_trajectories, sample_orbit_windows
 
 torch.set_default_dtype(torch.float64)
+
+# Arcadia's figure fonts, committed with the repository (see fonts/README.md)
+FONT_DIR = Path(__file__).resolve().parents[2] / "fonts"
 
 
 def collect_terms(model, block_size, n_windows, seed=0, offset=0):
@@ -164,8 +168,11 @@ def apply_figure_style():
     One override on top of the package: apc sets legend.borderaxespad to 0, which
     with frameon=False leaves the legend text flush against the spine. Restored to
     matplotlib's 0.5 so legends clear the axes.
+
+    The fonts come from the repository's fonts/ directory rather than the system,
+    so the figures render identically on any machine.
     """
-    apc.mpl.setup()
+    apc.mpl.setup(font_dirpath=str(FONT_DIR))
     mpl.rcParams['legend.borderaxespad'] = 0.5
 
 
