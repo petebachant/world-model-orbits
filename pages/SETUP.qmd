@@ -20,51 +20,31 @@ git clone https://github.com/{{< var pub.org >}}/{{< var pub.repo >}}.git
 
 ## Installation
 
-::: {.callout-important}
-The publication is rendered with [Quarto](https://quarto.org/). If you don't have it installed (check with `quarto --version`), you can install it [here](https://quarto.org/docs/get-started/).
-:::
+This repository is a [Calkit](https://docs.calkit.org) project: [`calkit.yaml`](https://github.com/{{< var pub.org >}}/{{< var pub.repo >}}/blob/main/calkit.yaml) defines the computational environment and the pipeline that produces the pub. Install [Calkit](https://docs.calkit.org/installation/), e.g., with `curl -LsSf install.calkit.org | sh` on macOS or Linux. The first time it runs, it offers to install Conda if it's missing, then creates the environment, including Quarto, from `env.yml` and the exact versions recorded in `.calkit/env-locks/`, so there's nothing else to install.
 
-This repository uses conda to manage the computational and build environment. If you don't have it installed (check with `conda --version`), you can find operating system-specific instructions for installing miniconda [here](https://docs.conda.io/projects/miniconda/en/latest/). After installing, run the following commands to create and activate the environment.
+If you plan to submit a pull request, also install the [pre-commit](https://pre-commit.com/) hooks:
 
 ```bash
-conda env create -n {{< var pub.repo >}} --file env.yml
-conda activate {{< var pub.repo >}}
-```
-
-Now, install any internal packages in the repository:
-
-```bash
-pip install -e .
-```
-
-And finally, if you plan to submit a pull request, install the [pre-commit](https://pre-commit.com/) hooks:
-
-```bash
-pre-commit install
+calkit xenv -n main -- pre-commit install
 ```
 
 # What's next?
 
-With a copy of the code and compute environment set up on your local machine, you can now reproduce or modify a local copy of the publication however you see fit. Read on to get started.
+With a copy of the code on your local machine, you can now reproduce or modify a local copy of the publication however you see fit. Read on to get started.
 
 ## Reproduce
 
-The best way to ensure you've correctly set up your code and compute environment is to reproduce this work.
-
-First regenerate the input data:
+The best way to ensure you've correctly set up your code and compute environment is to reproduce this work:
 
 ```bash
-python -m analysis.data_generation
-```
-Then, the analysis, and therefore the publication itself, can be reproduced with the following command:
-
-```bash
-make execute
+calkit run
 ```
 
-(Make sure you're in the conda environment you created above)
+This creates the environment, then runs each pipeline stage that's out of date with its code, data, or environment, and skips the rest. On a fresh copy, everything is already up to date. To see what would run and why, use `calkit status`, and to re-execute the notebook anyway, use `calkit run notebook --force`.
 
-This will execute and render the notebook `index.ipynb`, then build the publication site. To preview the site, use
+The model checkpoints are committed and their training stage is frozen, since training takes a GPU and isn't bit-reproducible. See the [README](https://github.com/{{< var pub.org >}}/{{< var pub.repo >}}#reproduce) to retrain them.
+
+To preview the site, use
 
 ```bash
 make preview
@@ -74,7 +54,7 @@ This will open a local instance of the publication in your default browser.
 
 ## Modify
 
-To modify or extend any analyses, open up `index.ipynb` with Jupyter or your favorite IDE. To preview changes as you modify the notebook, run `make preview` again and leave the command running. As you make changes to the notebook, the preview site will automatically reload.
+To modify or extend any analyses, open up `index.ipynb` with Jupyter (`calkit xenv -n main -- jupyter lab`) or your favorite IDE, using the environment in `.conda-envs/main`. To preview changes as you modify the notebook, run `make preview` again and leave the command running. As you make changes to the notebook, the preview site will automatically reload. When you're done, run `calkit run` so the published outputs come from a clean, top-to-bottom execution.
 
 ## Publish
 

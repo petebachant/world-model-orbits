@@ -6,16 +6,18 @@ The publication is hosted at [this URL](https://arcadia-science.github.io/world-
 
 ## Data Description
 
-No external data is required. The trained checkpoints are committed to this
-repository, so the notebook runs against the exact models the publication used;
-the trajectory data is generated locally by step 2 below and is not tracked.
+No external data is required. The trajectory data and the trained checkpoints are
+both committed to this repository, so the notebook runs against the exact data and
+models the publication used.
 
-**Trajectories** (`data_cv/`, ~27 MB). 20,000 two-body Kepler orbits, split 50/50
+**Trajectories** (`data_cv/`, ~21 MB). 20,000 two-body Kepler orbits, split 50/50
 into train and test. Each orbit is 100 samples of the $(x, y)$ coordinates of a point
 mass orbiting a fixed central mass with $GM = 1$, started at perihelion and integrated
 with `scipy.integrate.solve_ivp` at `rtol = atol = 1e-8`. Eccentricity, semi-major axis
 and initial orientation are drawn uniformly per orbit from $[0, 0.8)$, $[0.5, 2.0)$ and
-$[0, 2\pi)$; coordinates span roughly $\pm 3.5$. Generation is seeded (`seed = 1`).
+$[0, 2\pi)$; coordinates span roughly $\pm 3.5$. Generation is seeded (`seed = 1`),
+which makes it repeatable on one machine, but the floating-point results differ
+slightly between platforms, so the data is versioned rather than regenerated.
 
 | file | contents |
 |---|---|
@@ -34,32 +36,36 @@ Trajectory generation and the training loop are adapted from Liu et al.'s
 
 ## Reproduce
 
-All analysis code lives in the `analysis` package (`src/analysis/`). The
-publication notebook (`index.ipynb`) loads a generated dataset and the committed
-checkpoints; the steps below produce those inputs. See also
-[SETUP.qmd](pages/SETUP.qmd).
-
-### 1. Set up the environment
+The project is a [Calkit](https://docs.calkit.org) pipeline, defined in
+[`calkit.yaml`](calkit.yaml): generate the data, train the models, and execute
+`index.ipynb`. Install [Calkit](https://docs.calkit.org/installation/) and run it:
 
 ```bash
-conda env create -n world-model-orbits --file env.yml
-conda activate world-model-orbits
-pip install -e .          # makes the `analysis` package importable
+curl -LsSf install.calkit.org | sh
+calkit run
 ```
 
-### 2. Generate the dataset
+The first run offers to install Conda if it's missing. Or run `make setup`, which installs Calkit if it isn't yet, then Conda and the environment.
 
-Writes 20,000 Kepler trajectories (10k train + 10k test) to `data_cv/`:
+This creates the Conda environment from `env.yml` and the exact versions
+recorded in `.calkit/env-locks/` (Python, every package, and Quarto),
+then runs whatever is out of date with its code, data, or environment, and skips
+the rest. On a fresh clone everything is up to date, so it does nothing; edit a
+cell of `index.ipynb` or a module in `src/analysis/` and it re-executes the
+notebook. `calkit status` shows what's out of date and why, and a CI check
+([`pipeline.yml`](.github/workflows/pipeline.yml)) fails any pull request that
+changes code without re-running what depends on it.
 
-```bash
-python -m analysis.data_generation
-```
+| stage | does | runs when |
+|---|---|---|
+| `generate-data` | `python -m analysis.data_generation`, writing `data_cv/` (~2.5 min) | `data_generation.py` or the environment changes |
+| `train` | `python -m analysis.training`, writing the three checkpoints | never: it's frozen (see below) |
+| `notebook` | `quarto render index.ipynb --execute`, writing the outputs into `index.ipynb` (~1.5 min) | the notebook, `src/analysis/`, the data, the checkpoints, the fonts, or the environment changes |
 
-### 3. (Optional) Retrain the models
-
-The three models the analyses depend on are already in
-`checkpoints/kepler_cv_blocksize_elm/`, so this step is only needed if you want to
-train them yourself. Running it overwrites the committed checkpoints:
+The `train` stage is frozen, so `calkit run` never retrains the models: the
+committed checkpoints are the ones the publication used, and training isn't
+bit-reproducible on a GPU. It records how they were made. To retrain, run
+`calkit run train --force`, preferably on a GPU (~20k steps per model):
 
 | block_size | noise_scale | role |
 |---|---|---|
@@ -67,21 +73,21 @@ train them yourself. Running it overwrites the committed checkpoints:
 | 100 | 0.1 | noisy long-context (Keplerian) |
 | 2   | 0.0 | noiseless short-context (Verlet + Newtonian gravity) |
 
+`python -m analysis.training --smoke` is a fast sanity check (200 steps). It writes
+its checkpoints with a `_smoke` suffix, so it never overwrites the committed ones.
+
+Figures use the fonts in `fonts/`, so they render the same on any machine.
+
+### Without Calkit
+
+With [Conda](https://conda-forge.org/download/):
+
 ```bash
-python -m analysis.training           # full run (~20k steps/model, GPU recommended)
-python -m analysis.training --smoke   # fast sanity check (200 steps, not for publication)
+conda env create -n world-model-orbits --file env.yml  # includes Quarto
+conda activate world-model-orbits
+python -m analysis.data_generation                      # only to regenerate data_cv/
+quarto render index.ipynb --execute
 ```
-
-`--smoke` writes its checkpoints and results with a `_smoke` suffix, so it never
-overwrites the committed checkpoints and never satisfies the resume check that
-would otherwise cause a later full run to be skipped. The notebook loads only the
-unsuffixed names, so smoke output cannot silently reach the analyses.
-
-### 4. Run the analyses
-
-With `data_cv/` in place, execute `index.ipynb` (e.g. in Jupyter, or using
-`make execute`).
-
 
 ## Contribute
 
