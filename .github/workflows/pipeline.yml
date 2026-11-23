@@ -1,0 +1,33 @@
+# Fails when something committed is out of date with the code, data, or
+# environment that produces it, e.g., a change to src/analysis/ without
+# re-executing index.ipynb. This only reads the hashes in dvc.lock, so it runs
+# in seconds and doesn't install the environment. To fix a failure, run
+# `calkit run` locally and commit the result.
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+name: Pipeline
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      # Pinned, so a new Calkit release can't fail this check by itself.
+      # Bump it along with the version calkit.yaml requires.
+      - name: Install Calkit
+        run: uv tool install calkit-python==0.52.3
+
+      - name: Check that the pipeline is up to date
+        run: |
+          calkit status --category pipeline --no-env-check
+          calkit status --category pipeline --no-env-check --json \
+            | jq -e '.pipeline.is_stale == false' > /dev/null
