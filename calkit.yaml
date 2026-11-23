@@ -1,0 +1,84 @@
+# yaml-language-server: $schema=https://docs.calkit.org/schemas/calkit.json
+#
+# The reproducible pipeline behind this publication. `calkit run` brings every
+# output up to date with the code, data, and environment that produce it,
+# skipping anything that already is. See README.md#reproduce.
+name: world-model-orbits
+title: >-
+  From Kepler-ish to Newton-ish: Understanding learned world models in
+  transformers
+
+# What this machine needs. `calkit run` checks for it, and offers to install
+# Conda if it's missing; an older Calkit says to upgrade.
+requirements:
+  - calkit>=0.52.3
+  - conda
+
+environments:
+  main:
+    kind: conda
+    path: env.yml
+    # Kept in the project, so it doesn't clash with other projects' envs
+    prefix: .conda-envs/main
+
+pipeline:
+  stages:
+    generate-data:
+      kind: shell-command
+      command: python -m analysis.data_generation
+      environment: main
+      description: >-
+        Generate 20,000 Kepler orbits (seed 1). Kept in Git (21 MB): seeded
+        generation is repeatable on one machine, but the floating-point
+        results differ between platforms, so regenerating elsewhere wouldn't
+        give back the exact data the checkpoints were analyzed with.
+      inputs:
+        - src/analysis/data_generation.py
+      outputs:
+        - path: data_cv
+          storage: git
+
+    train:
+      kind: shell-command
+      command: python -m analysis.training
+      environment: main
+      description: >-
+        Train the three models. Frozen: the committed checkpoints are the
+        ones the publication used, and GPU training isn't bit-reproducible,
+        so `calkit run` never retrains them by accident. To retrain, run
+        `calkit run train --force` on a GPU machine.
+      frozen: true
+      inputs:
+        - from_stage_outputs: generate-data
+        - src/analysis/training.py
+        - src/analysis/model.py
+        - src/analysis/data.py
+        - src/analysis/probing.py
+      outputs:
+        - path: checkpoints/kepler_cv_blocksize_elm/model_block_size_2_num_trajectories_10000_noise_scale_0.1.pt
+          storage: git
+        - path: checkpoints/kepler_cv_blocksize_elm/model_block_size_100_num_trajectories_10000_noise_scale_0.1.pt
+          storage: git
+        - path: checkpoints/kepler_cv_blocksize_elm/model_block_size_2_num_trajectories_10000_noise_scale_0.0.pt
+          storage: git
+
+    notebook:
+      kind: quarto
+      target_path: index.ipynb
+      args:
+        - --execute
+      environment: main
+      description: >-
+        Execute the publication top to bottom with Quarto, which writes the
+        outputs back into index.ipynb (what the site renders) and to
+        _freeze/. Reruns when the notebook, the analysis package, the fonts,
+        the data, the checkpoints, or the environment changes, so what's
+        published always comes from a clean run.
+      inputs:
+        - src/analysis
+        - fonts
+        - from_stage_outputs: generate-data
+        - from_stage_outputs: train
+      outputs:
+        - path: _freeze/index
+          storage: git

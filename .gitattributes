@@ -1,0 +1,10 @@
+# >>> calkit generated files (managed by calkit) >>>
+/.calkit/** text eol=lf
+# <<< calkit generated files <<<
+
+# Generated, so GitHub collapses them in diffs
+/dvc.yaml linguist-generated
+/dvc.lock linguist-generated
+/.calkit/** linguist-generated
+/_freeze/** linguist-generated
+/data_cv/** linguist-generated

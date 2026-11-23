@@ -1,0 +1,123 @@
+schema: '2.0'
+stages:
+  generate-data:
+    cmd: calkit xenv -n main --no-check -- bash --noprofile --norc -c "python -m
+      analysis.data_generation"
+    deps:
+    - path: .calkit/env-locks/main
+      hash: md5
+      md5: a410be44faa3270a255d85d2b2b04e1a.dir
+      size: 25918
+      nfiles: 3
+    - path: src/analysis
+      hash: md5
+      md5: 655a35e57d065bd773ec622dc624e9c2.dir
+      size: 151199
+      nfiles: 7
+    - path: src/analysis/data_generation.py
+      hash: md5
+      md5: d27198ec26cb435da441eccaeb668689
+      size: 13766
+    outs:
+    - path: data_cv
+      hash: md5
+      md5: 13d732ff698d85088bbc8a802c866b77.dir
+      size: 21259845
+      nfiles: 7
+  notebook:
+    cmd: calkit quarto render -e main --no-check index.ipynb -- --execute
+    deps:
+    - path: .calkit/env-locks/main
+      hash: md5
+      md5: a410be44faa3270a255d85d2b2b04e1a.dir
+      size: 25918
+      nfiles: 3
+    - path: .calkit/notebooks/cleaned/index.ipynb
+      hash: md5
+      md5: 25687dcb1a516688127fb03a68f66c9c
+      size: 107072
+    - path: 
+        checkpoints/kepler_cv_blocksize_elm/model_block_size_100_num_trajectories_10000_noise_scale_0.1.pt
+      hash: md5
+      md5: 3d65ad08736e02c6161945c7c0326cd6
+      size: 201933
+    - path: 
+        checkpoints/kepler_cv_blocksize_elm/model_block_size_2_num_trajectories_10000_noise_scale_0.0.pt
+      hash: md5
+      md5: 816e751155b6ce5ddabaafbc5db4904a
+      size: 109405
+    - path: 
+        checkpoints/kepler_cv_blocksize_elm/model_block_size_2_num_trajectories_10000_noise_scale_0.1.pt
+      hash: md5
+      md5: 3451a469c28be4ec20d9cdd941967665
+      size: 109405
+    - path: data_cv
+      hash: md5
+      md5: 13d732ff698d85088bbc8a802c866b77.dir
+      size: 21259845
+      nfiles: 7
+    - path: fonts
+      hash: md5
+      md5: fc275485c478f4e9185fe0717cb27904.dir
+      size: 88787
+      nfiles: 5
+    - path: src/analysis
+      hash: md5
+      md5: 655a35e57d065bd773ec622dc624e9c2.dir
+      size: 151199
+      nfiles: 7
+    outs:
+    - path: _freeze/index
+      hash: md5
+      md5: fd6b4e0281fc46ac75566cd3e63e6675.dir
+      size: 2275240
+      nfiles: 30
+  train:
+    cmd: calkit xenv -n main --no-check -- bash --noprofile --norc -c "python -m
+      analysis.training"
+    deps:
+    - path: .python-version
+      hash: md5
+      md5: 84a25474e726f8df9f663e0fff1f2390
+      size: 8
+    - path: data_cv
+      hash: md5
+      md5: 13d732ff698d85088bbc8a802c866b77.dir
+      size: 21259845
+      nfiles: 7
+    - path: src/analysis/data.py
+      hash: md5
+      md5: 5747bbdc1c9825393b18833de555498e
+      size: 14492
+    - path: src/analysis/model.py
+      hash: md5
+      md5: 070cf46a8aa707a52c1394970a2d484d
+      size: 27890
+    - path: src/analysis/probing.py
+      hash: md5
+      md5: d6b5f0c4b791791f5b2a2910585bcada
+      size: 13516
+    - path: src/analysis/training.py
+      hash: md5
+      md5: 29e3bc445c47846270da0beac2ce2d48
+      size: 42124
+    - path: uv.lock
+      hash: md5
+      md5: 5ac27e2a731b4fc601d0a3f47561c79a
+      size: 207000
+    outs:
+    - path: 
+        checkpoints/kepler_cv_blocksize_elm/model_block_size_100_num_trajectories_10000_noise_scale_0.1.pt
+      hash: md5
+      md5: 3d65ad08736e02c6161945c7c0326cd6
+      size: 201933
+    - path: 
+        checkpoints/kepler_cv_blocksize_elm/model_block_size_2_num_trajectories_10000_noise_scale_0.0.pt
+      hash: md5
+      md5: 816e751155b6ce5ddabaafbc5db4904a
+      size: 109405
+    - path: 
+        checkpoints/kepler_cv_blocksize_elm/model_block_size_2_num_trajectories_10000_noise_scale_0.1.pt
+      hash: md5
+      md5: 3451a469c28be4ec20d9cdd941967665
+      size: 109405

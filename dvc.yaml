@@ -1,0 +1,55 @@
+stages:
+  generate-data:
+    cmd: calkit xenv -n main --no-check -- bash --noprofile --norc -c "python -m
+      analysis.data_generation"
+    deps:
+      - src/analysis/data_generation.py
+      - .calkit/env-locks/main
+      - src/analysis
+    outs:
+      - data_cv:
+          cache: false
+          persist: false
+    desc: Automatically generated from the 'generate-data' stage in calkit.yaml.
+      Changes made here will be overwritten.
+  train:
+    cmd: calkit xenv -n main --no-check -- bash --noprofile --norc -c "python -m
+      analysis.training"
+    deps:
+      - src/analysis/training.py
+      - src/analysis/model.py
+      - src/analysis/data.py
+      - src/analysis/probing.py
+      - .calkit/env-locks/main
+      - src/analysis
+      - data_cv
+    outs:
+      - checkpoints/kepler_cv_blocksize_elm/model_block_size_2_num_trajectories_10000_noise_scale_0.1.pt:
+          cache: false
+          persist: false
+      - checkpoints/kepler_cv_blocksize_elm/model_block_size_100_num_trajectories_10000_noise_scale_0.1.pt:
+          cache: false
+          persist: false
+      - checkpoints/kepler_cv_blocksize_elm/model_block_size_2_num_trajectories_10000_noise_scale_0.0.pt:
+          cache: false
+          persist: false
+    frozen: true
+    desc: Automatically generated from the 'train' stage in calkit.yaml. Changes
+      made here will be overwritten.
+  notebook:
+    cmd: calkit quarto render -e main --no-check index.ipynb -- --execute
+    deps:
+      - .calkit/notebooks/cleaned/index.ipynb
+      - src/analysis
+      - fonts
+      - .calkit/env-locks/main
+      - data_cv
+      - checkpoints/kepler_cv_blocksize_elm/model_block_size_2_num_trajectories_10000_noise_scale_0.1.pt
+      - checkpoints/kepler_cv_blocksize_elm/model_block_size_100_num_trajectories_10000_noise_scale_0.1.pt
+      - checkpoints/kepler_cv_blocksize_elm/model_block_size_2_num_trajectories_10000_noise_scale_0.0.pt
+    outs:
+      - _freeze/index:
+          cache: false
+          persist: false
+    desc: Automatically generated from the 'notebook' stage in calkit.yaml.
+      Changes made here will be overwritten.

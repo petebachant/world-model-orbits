@@ -1,0 +1,7 @@
+# Add patterns of files dvc should ignore, which could improve
+# the performance. Learn more at
+# https://dvc.org/doc/user-guide/dvcignore
+
+# Importing the generated orbital_params_chunk_*.py files writes bytecode
+# next to them, which must not count as a change to the dataset
+__pycache__/
