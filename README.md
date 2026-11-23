@@ -76,7 +76,10 @@ bit-reproducible on a GPU. It records how they were made. To retrain, run
 `python -m analysis.training --smoke` is a fast sanity check (200 steps). It writes
 its checkpoints with a `_smoke` suffix, so it never overwrites the committed ones.
 
-Figures use the fonts in `fonts/`, so they render the same on any machine.
+The numbers quoted in the text are computed by the notebook with Quarto inline
+expressions (`` `{python} ...` ``) rather than typed in, so they can't drift from
+the results. Figures use the fonts in `fonts/`, so they render the same on any
+machine.
 
 ### Without Calkit
 

@@ -19,12 +19,12 @@
     }
   },
   "notebook": {
-    "start_time": "2026-11-23T05:06:25.071000",
-    "end_time": "2026-11-23T05:08:22.370000",
+    "start_time": "2026-11-23T05:08:59.665000",
+    "end_time": "2026-11-23T05:13:38.478000",
     "environment": "main",
-    "git_rev": "29677b4e86e39c61169282883e7c4f9615d36b5b",
+    "git_rev": "18b9cf1f074dc01f26340ddf3cfe45aae7b0d92b",
     "git_dirty": true,
-    "dvc_lock_hash": "sha256:2b7c3e335dbcbc4321fad61daad21827b68ea31c47d3e3df1136d62ff80cc0bf",
+    "dvc_lock_hash": "sha256:589f2b55d27f535d41988d1533d37c72b76a5ed7fc9e3b8d5719f403e457c039",
     "calkit_version": "0.52.3",
     "system": {
       "machine_id": "33C4DDA7-7423-5B6A-B86F-EA6859EB058E",

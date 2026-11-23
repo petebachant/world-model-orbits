@@ -34,8 +34,8 @@ stages:
       nfiles: 3
     - path: .calkit/notebooks/cleaned/index.ipynb
       hash: md5
-      md5: 25687dcb1a516688127fb03a68f66c9c
-      size: 107072
+      md5: 358888f9c9a5b1fd305a6064c5c22334
+      size: 108469
     - path: 
         checkpoints/kepler_cv_blocksize_elm/model_block_size_100_num_trajectories_10000_noise_scale_0.1.pt
       hash: md5
@@ -69,8 +69,8 @@ stages:
     outs:
     - path: _freeze/index
       hash: md5
-      md5: fd6b4e0281fc46ac75566cd3e63e6675.dir
-      size: 2275240
+      md5: ebe56f95469ac604fe2f3aa3a0513a0c.dir
+      size: 2275976
       nfiles: 30
   train:
     cmd: calkit xenv -n main --no-check -- bash --noprofile --norc -c "python -m
