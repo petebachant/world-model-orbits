@@ -1,3 +1,8 @@
+# Check out text files with LF everywhere, including Windows, whose Git
+# converts them to CRLF by default. Calkit hashes the files stages depend on,
+# so CRLF would make an up-to-date pipeline look out of date there.
+* text=auto eol=lf
+
 # >>> calkit generated files (managed by calkit) >>>
 /.calkit/** text eol=lf
 # <<< calkit generated files <<<
