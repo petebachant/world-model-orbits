@@ -1,0 +1,6 @@
+{
+  "eccentricity-max": 0.8,
+  "noise-sigma": 0.1,
+  "semimajor-max": 2.0,
+  "semimajor-min": 0.5
+}

@@ -11,7 +11,7 @@ title: >-
 # What this machine needs. `calkit run` checks for it, and offers to install
 # Conda if it's missing; an older Calkit says to upgrade.
 requirements:
-  - calkit>=0.52.3
+  - calkit>=0.53.0
   - conda
 
 environments:
@@ -82,3 +82,31 @@ pipeline:
       outputs:
         - path: _freeze/index
           storage: git
+
+# The bibliography, and values the publication quotes from its references,
+# which `calkit check repro` checks against the references' PDFs
+references:
+  - path: ref.bib
+    values:
+      liu2026kepler:
+        eccentricity-max:
+          value: 0.8
+          page: 5
+          context: eccentricity e ∈ [0.0, 0.8]
+          description: Largest eccentricity of the training orbits
+        semimajor-min:
+          value: 0.5
+          page: 5
+          context: semimajor axis a ∈ [0.5, 2.0]
+          description: Smallest semi-major axis of the training orbits
+        semimajor-max:
+          value: 2.0
+          page: 5
+          context: semimajor axis a ∈ [0.5, 2.0]
+          description: Largest semi-major axis of the training orbits
+        noise-sigma:
+          value: 0.1
+          page: 6
+          context: an intermediate noise level (σ = 0.1) yields the most
+            accurate predictions
+          description: Context noise that predicted best

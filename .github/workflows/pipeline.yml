@@ -24,7 +24,7 @@ jobs:
       # Pinned, so a new Calkit release can't fail this check by itself.
       # Bump it along with the version calkit.yaml requires.
       - name: Install Calkit
-        run: uv tool install calkit-python==0.52.3
+        run: uv tool install calkit-python==0.53.0
 
       - name: Check that the pipeline is up to date
         run: |

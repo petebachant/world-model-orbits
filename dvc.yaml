@@ -43,6 +43,7 @@ stages:
       - src/analysis
       - fonts
       - .calkit/env-locks/main
+      - .calkit/reference-values/liu2026kepler.json
       - data_cv
       - checkpoints/kepler_cv_blocksize_elm/model_block_size_2_num_trajectories_10000_noise_scale_0.1.pt
       - checkpoints/kepler_cv_blocksize_elm/model_block_size_100_num_trajectories_10000_noise_scale_0.1.pt
